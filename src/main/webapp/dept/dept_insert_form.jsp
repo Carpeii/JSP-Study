@@ -7,8 +7,20 @@
 <title>Insert title here</title>
 </head>
 <body>
+<script>
+    function validateForm() {
+        var deptno = document.getElementById('deptno').value;
+        var dname = document.getElementById('dname').value;
+        var loc = document.getElementById('loc').value;
 
-<form action="dept_insert_form_ok.jsp" method="post">
+        if (deptno === "" || dname === "" || loc === "") {
+            alert('모든 필드를 채워주세요.');
+            return false;
+        }
+        return true;
+    }
+</script>
+<form action="dept_insert_form_ok.jsp" method="post" onsubmit="return validateForm()">
 <fieldset>
 <label for="deptno">부서 번호</label>
 <input type="text" id="deptno" name="deptno" />
