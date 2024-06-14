@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<form action="./dept_insert_form_ok.jsp" method="post">
+<form action="dept_insert_form_ok.jsp" method="post">
 <fieldset>
 <label for="deptno">부서 번호</label>
 <input type="text" id="deptno" name="deptno" />

@@ -57,7 +57,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<a href="./dept_insert_form.jsp">내용입력</a>
+<a href="dept_insert_form.jsp">내용입력</a>
 <hr/>
 <%=sbHtml.toString() %>
 

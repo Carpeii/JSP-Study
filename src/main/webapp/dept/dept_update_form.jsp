@@ -51,7 +51,7 @@
 </head>
 <body>
 
-<form action="./dept_delete_form_ok.jsp"  method="post">
+<form action="dept_update_form_ok.jsp" method="post">
 <fieldset>
 <label for="deptno">부서 번호</label>
 <input type="text" id="deptno" name="deptno" value="<%=deptno%>" readonly/>
@@ -59,12 +59,12 @@
 <br/><br/>
 
 <label for="dname">부서 이름</label>
-<input type="text" id="dname" name="dname" value="<%=dname%>"readonly/>
+<input type="text" id="dname" name="dname" value="<%=dname%>"/>
 
 <br/><br/>
 
 <label for="loc">부서위치</label>
-<input type="text" id="loc" name="loc"value="<%=loc%>"readonly/>
+<input type="text" id="loc" name="loc"value="<%=loc%>"/>
 <br/><br/>
 
 <input type="submit" id="btn" value="내용입력" />
