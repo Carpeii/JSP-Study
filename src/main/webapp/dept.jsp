@@ -32,6 +32,8 @@
         while(rs.next()) {
             sbHtml.append("<tr>");
             sbHtml.append("<td>" + rs.getString("deptno") + "</td>");
+            sbHtml.append("<td>" + rs.getString("dname") + "</td>");
+            sbHtml.append("<td>" + rs.getString("loc") + "</td>");
         }
         sbHtml.append("</table>");
 
@@ -53,6 +55,9 @@
     <title>Insert title here</title>
 </head>
 <body>
+<a href="dept_insert">
+    dept_insert
+</a>
 <%=sbHtml.toString() %>
 
 </body>
