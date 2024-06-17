@@ -44,11 +44,11 @@
 			String hit = rs.getString("hit");
 			sbHtml.append("<tr>");
 			sbHtml.append("<td>&nbsp;</td>");
-			sbHtml.append("<td>1</td>");
-			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp\">adfas</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
-			sbHtml.append("<td>asdfa</td>");
-			sbHtml.append("<td>2017-01-31</td>");
-			sbHtml.append("<td>6</td>");
+			sbHtml.append("<td>"+seq+"</td>");
+			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp\">" + subject + "</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
+			sbHtml.append("<td>"+writer+"</td>");
+			sbHtml.append("<td>"+wdate+"</td>");
+			sbHtml.append("<td>" +hit +"</td>");
 			sbHtml.append("<td>&nbsp;</td>");
 			sbHtml.append("</tr>");
 		}
@@ -90,24 +90,7 @@
 				<th width="5%">조회</th>
 				<th width="3%">&nbsp;</th>
 			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td>1</td>
-				<td class="left"><a href="board_view1.jsp">adfas</a>&nbsp;<img src="../../images/icon_new.gif" alt="NEW"></td>
-				<td>asdfa</td>
-				<td>2017-01-31</td>
-				<td>6</td>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td>1</td>
-				<td class="left"><a href="board_view1.jsp">adfas</a>&nbsp;<img src="../../images/icon_new.gif" alt="NEW"></td>
-				<td>asdfa</td>
-				<td>2017-01-31</td>
-				<td>6</td>
-				<td>&nbsp;</td>
-			</tr>
+				<%= sbHtml.toString()%>
 			</table>
 		</div>	
 
