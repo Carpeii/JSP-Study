@@ -1,5 +1,13 @@
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="javax.naming.Context" %>
+<%@ page import="javax.naming.InitialContext" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="javax.naming.NamingException" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="java.sql.ResultSet" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+		 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +17,55 @@
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board.css">
 </head>
+ <%
+	request.setCharacterEncoding("utf-8");
+	PreparedStatement pstmt = null;
+	Connection conn= null;
+	 ResultSet rs =null;
+	 StringBuilder sbHtml = new StringBuilder();
+	try {
+		Context initCtx = new InitialContext();
+		Context envCtx = (Context) initCtx.lookup("java:comp/env");
+		DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb1");
 
+		conn = dataSource.getConnection();
+
+		String sql = "SELECT seq, subject, writer, wdate, hit FROM board1 order by seq desc";
+		pstmt = conn.prepareStatement(sql);
+
+		rs = pstmt.executeQuery();
+
+		while (rs.next()) {
+//			System.out.println(rs.getString("seq"));
+			String seq = rs.getString("seq");
+			String subject = rs.getString("subject");
+			String writer = rs.getString("writer");
+			String wdate = rs.getString("wdate");
+			String hit = rs.getString("hit");
+			sbHtml.append("<tr>");
+			sbHtml.append("<td>&nbsp;</td>");
+			sbHtml.append("<td>1</td>");
+			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp\">adfas</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
+			sbHtml.append("<td>asdfa</td>");
+			sbHtml.append("<td>2017-01-31</td>");
+			sbHtml.append("<td>6</td>");
+			sbHtml.append("<td>&nbsp;</td>");
+			sbHtml.append("</tr>");
+		}
+	}
+	catch (NamingException e) {
+		e.printStackTrace();
+	}catch (SQLException e) {
+		e.printStackTrace();
+	}finally {
+		if(pstmt != null) {
+			pstmt.close();
+		}
+		if(conn != null) {
+			conn.close();
+		}
+	}
+ %>
 <body>
 <!-- 상단 디자인 -->
 <div class="con_title">
