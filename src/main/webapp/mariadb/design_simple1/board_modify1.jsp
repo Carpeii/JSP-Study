@@ -1,5 +1,13 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+﻿<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="javax.naming.Context" %>
+<%@ page import="javax.naming.InitialContext" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="javax.naming.NamingException" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+		 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +17,46 @@
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board.css">
 </head>
+<%
+	request.setCharacterEncoding("utf-8");
+	String seq = request.getParameter("seq");
+//	System.out.println(seq);
+	PreparedStatement pstmt = null;
+	Connection conn= null;
+	ResultSet rs = null;
 
+	String subject = "";
+	String writer="";
+
+	try {
+		Context initCtx = new InitialContext();
+		Context envCtx = (Context) initCtx.lookup("java:comp/env");
+		DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb1");
+
+		conn = dataSource.getConnection();
+		//조회수 증가
+		String sql = "UPDATE SET subject=?, content=? from board1 where seq=?";
+		pstmt = conn.prepareStatement(sql);
+
+		pstmt.setString(2, seq);
+
+		pstmt.executeUpdate();
+	}
+	catch (NamingException e) {
+		e.printStackTrace();
+	}catch (SQLException e) {
+		e.printStackTrace();
+	}finally {
+		if(pstmt != null) {
+			pstmt.close();
+		}
+		if(conn != null) {
+			conn.close();
+		}if (rs!=null){
+			rs.close();
+		}
+	}
+%>
 <body>
 <!-- 상단 디자인 -->
 <div class="con_title">
