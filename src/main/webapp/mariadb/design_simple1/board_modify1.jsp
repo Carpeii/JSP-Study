@@ -26,8 +26,10 @@
 	ResultSet rs = null;
 
 	String subject = "";
-	String writer="";
-
+	String content="";
+	String writer = "";
+	String password="";
+	String mail="";
 	try {
 		Context initCtx = new InitialContext();
 		Context envCtx = (Context) initCtx.lookup("java:comp/env");
@@ -35,22 +37,23 @@
 
 		conn = dataSource.getConnection();
 		//조회수 증가
-		String sql = "UPDATE SET subject=?, content=? from board1 where seq=?";
+//		String sql = "UPDATE SET subject=?, content=? from board1 where seq=?";
+		String sql = "SELECT writer, subject, content, mail from board1 where seq=?";
 		pstmt = conn.prepareStatement(sql);
-
-		pstmt.setString(2, seq);
-
-		pstmt.executeUpdate();
-	}
-	catch (NamingException e) {
-		e.printStackTrace();
-	}catch (SQLException e) {
+		pstmt.setString(1, seq);
+		rs = pstmt.executeQuery();
+		if (rs.next()) {
+			writer = rs.getString("writer");
+			subject = rs.getString("subject");
+			content = rs.getString("content");
+			mail = rs.getString("mail");
+		}
+	}catch (SQLException e){
 		e.printStackTrace();
 	}finally {
-		if(pstmt != null) {
+		if(pstmt!=null){
 			pstmt.close();
-		}
-		if(conn != null) {
+		}if (conn!=null){
 			conn.close();
 		}if (rs!=null){
 			rs.close();
@@ -71,11 +74,11 @@
 				<table>
 				<tr>
 					<th class="top">글쓴이</th>
-					<td class="top"><input type="text" name="writer" value="" class="board_view_input_mail" maxlength="5" readonly/></td>
+					<td class="top"><input type="text" name="writer" value="<%=writer%>" class="board_view_input_mail" maxlength="5" readonly/></td>
 				</tr>
 				<tr>
 					<th>제목</th>
-					<td><input type="text" name="subject" value="" class="board_view_input" /></td>
+					<td><input type="text" name="subject" value="<%=subject%>" class="board_view_input" /></td>
 				</tr>
 				<tr>
 					<th>비밀번호</th>
@@ -83,11 +86,11 @@
 				</tr>
 				<tr>
 					<th>내용</th>
-					<td><textarea name="content" class="board_editor_area"></textarea></td>
+					<td><textarea name="content" class="board_editor_area"><%=content%></textarea></td>
 				</tr>
 				<tr>
 					<th>이메일</th>
-					<td><input type="text" name="mail1" value="" class="board_view_input_mail"/> @ <input type="text" name="mail2" value="" class="board_view_input_mail"/></td>
+					<td><input type="text" name="mail1" value="<%=mail%>" class="board_view_input_mail"/></td>
 				</tr>
 				</table>
 			</div>
