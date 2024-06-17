@@ -33,7 +33,7 @@
 
     PreparedStatement pstmt = null;
     Connection conn= null;
-    int flag = 0;
+    int flag = 1;
     try {
         Context initCtx = new InitialContext();
         Context envCtx = (Context) initCtx.lookup("java:comp/env");
@@ -51,7 +51,7 @@
         pstmt.setString(6, wip);
 
         if(pstmt.executeUpdate()==1){
-            flag = 1;
+            flag = 0;
         }
     }
     catch (NamingException e) {
@@ -66,13 +66,18 @@
             conn.close();
         }
     }
+    out.println("<script type='text/javascript'>");
     if(flag==0){
         System.out.println("정상");
+        out.println("alert('글쓰기 성공');");
+        out.println("location.href='./board_list1.jsp';");
     }
     else {
         System.out.println("에러");
+        out.println("alert('글쓰기에 실패');");
+        out.println("history.back();");
     }
-    
+    out.println("</script>");
 %>
 <html>
 <head>
