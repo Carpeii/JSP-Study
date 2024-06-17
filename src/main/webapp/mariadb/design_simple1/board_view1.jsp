@@ -1,5 +1,13 @@
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="javax.naming.Context" %>
+<%@ page import="javax.naming.InitialContext" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="javax.naming.NamingException" %>
+<%@ page import="java.sql.ResultSet" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+		 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +17,66 @@
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board.css">
 </head>
+<%
+	request.setCharacterEncoding("utf-8");
+	String seq = request.getParameter("seq");
+//	System.out.println(seq);
+	PreparedStatement pstmt = null;
+	Connection conn= null;
+	ResultSet rs = null;
 
+	String subject = "";
+	String writer="";
+	String mail="";
+	String wip="";
+	String wdate="";
+	String hit="";
+	String content="";
+
+	try {
+		Context initCtx = new InitialContext();
+		Context envCtx = (Context) initCtx.lookup("java:comp/env");
+		DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb1");
+
+		conn = dataSource.getConnection();
+		//조회수 증가
+		String sql = "UPDATE board1 set hit=hit+1 where seq=?";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, seq);
+
+		pstmt.executeUpdate();
+
+		sql = "SELECT subject, writer, mail, wip, wdate, hit, content FROM board1 WHERE seq = ?";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, seq);
+
+		rs = pstmt.executeQuery();
+		if (rs.next()) {
+			subject = rs.getString("subject");
+			writer = rs.getString("writer");
+			mail = rs.getString("mail");
+			wip = rs.getString("wip");
+			wdate = rs.getString("wdate");
+			hit = rs.getString("hit");
+			content = rs.getString("content");
+		}
+
+	}
+	catch (NamingException e) {
+		e.printStackTrace();
+	}catch (SQLException e) {
+		e.printStackTrace();
+	}finally {
+		if(pstmt != null) {
+			pstmt.close();
+		}
+		if(conn != null) {
+			conn.close();
+		}if (rs!=null){
+			rs.close();
+		}
+	}
+%>
 <body>
 <!-- 상단 디자인 -->
 <div class="con_title">
@@ -23,18 +90,18 @@
 			<table>
 			<tr>
 				<th width="10%">제목</th>
-				<td width="60%">제목입니다.</td>
+				<td width="60%"><%=subject%></td>
 				<th width="10%">등록일</th>
-				<td width="20%">2017.01.31 09:57</td>
+				<td width="20%"><%=wdate%></td>
 			</tr>
 			<tr>
 				<th>글쓴이</th>
-				<td>작성자(test@test.com)(000.000.000.000)</td>
+				<td><%=writer%>(<%=mail%>)(<%=wip%>)</td>
 				<th>조회</th>
-				<td>3</td>
+				<td><%=hit%></td>
 			</tr>
 			<tr>
-				<td colspan="4" height="200" valign="top" style="padding: 20px; line-height: 160%">내용입니다.</td>
+				<td colspan="4" height="200" valign="top" style="padding: 20px; line-height: 160%"><%=content%></td>
 			</tr>
 			</table>
 		</div>

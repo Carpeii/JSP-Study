@@ -45,7 +45,7 @@
 			sbHtml.append("<tr>");
 			sbHtml.append("<td>&nbsp;</td>");
 			sbHtml.append("<td>"+seq+"</td>");
-			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp\">" + subject + "</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
+			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp?seq="+ seq +"\">" + subject + "</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
 			sbHtml.append("<td>"+writer+"</td>");
 			sbHtml.append("<td>"+wdate+"</td>");
 			sbHtml.append("<td>" +hit +"</td>");
