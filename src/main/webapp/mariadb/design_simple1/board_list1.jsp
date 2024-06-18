@@ -23,17 +23,22 @@
 	Connection conn= null;
 	 ResultSet rs =null;
 	 StringBuilder sbHtml = new StringBuilder();
+	 int totalRecords = 0;
 	try {
 		Context initCtx = new InitialContext();
 		Context envCtx = (Context) initCtx.lookup("java:comp/env");
 		DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb1");
 
 		conn = dataSource.getConnection();
-
-		String sql = "SELECT seq, subject, writer, wdate, hit FROM board1 order by seq desc";
+		//date_format(wdate,'%Y-%m-%d') wdate, hit, datediff(now(), wdate) as wgap
+		String sql = "SELECT seq, subject, writer, date_format(wdate,'%Y-%m-%d') wdate, hit, datediff(now(), wdate) as wgap FROM board1 order by seq desc";
 		pstmt = conn.prepareStatement(sql);
 
 		rs = pstmt.executeQuery();
+
+		rs.last();
+		totalRecords = rs.getRow();
+		rs.beforeFirst();
 
 		while (rs.next()) {
 //			System.out.println(rs.getString("seq"));
@@ -42,10 +47,15 @@
 			String writer = rs.getString("writer");
 			String wdate = rs.getString("wdate");
 			String hit = rs.getString("hit");
+			int wgap = rs.getInt("wgap");
 			sbHtml.append("<tr>");
 			sbHtml.append("<td>&nbsp;</td>");
 			sbHtml.append("<td>"+seq+"</td>");
-			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp?seq="+ seq +"\">" + subject + "</a>&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\"></td>");
+			sbHtml.append("<td class=\"left\"><a href=\"board_view1.jsp?seq="+ seq +"\">" + subject + "</a>");
+			if(wgap ==0){
+				sbHtml.append("&nbsp;<img src=\"../../images/icon_new.gif\" alt=\"NEW\">");
+			}
+			sbHtml.append("</td>");
 			sbHtml.append("<td>"+writer+"</td>");
 			sbHtml.append("<td>"+wdate+"</td>");
 			sbHtml.append("<td>" +hit +"</td>");
@@ -75,7 +85,7 @@
 <div class="con_txt">
 	<div class="contents_sub">
 		<div class="board_top">
-			<div class="bold">총 <span class="txt_orange">1</span>건</div>
+			<div class="bold">총 <span class="txt_orange"><%=totalRecords%></span>건</div>
 		</div>
 
 		<!--게시판-->
