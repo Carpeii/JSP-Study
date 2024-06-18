@@ -26,6 +26,7 @@
     System.out.println(password);
     System.out.println(content);
 
+    System.out.println(wip);
     PreparedStatement pstmt = null;
     Connection conn= null;
     int flag = 1;

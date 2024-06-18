@@ -1,13 +1,71 @@
-﻿<%@ page import="java.sql.PreparedStatement" %>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.ResultSet" %>
-<%@ page import="javax.naming.Context" %>
-<%@ page import="javax.naming.InitialContext" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="java.sql.SQLException" %>
-<%@ page import="javax.naming.NamingException" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-		 pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+	
+	 
+    	
+     <%@page import="javax.naming.Context" %>
+    <%@page import="javax.naming.InitialContext" %>
+    <%@page import="javax.naming.NamingException" %>
+    <%@page import="javax.sql.DataSource" %>
+    
+    <%@page import="java.sql.Connection" %>
+    <%@page import="java.sql.PreparedStatement" %>
+    <%@page import="java.sql.ResultSet" %>
+    <%@page import="java.sql.SQLException" %>
+    
+	
+	<%
+	request.setCharacterEncoding("utf-8");
+	String seq = request.getParameter("seq");
+	
+	
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String subject = "";
+		String writer = "";
+		String content = "";
+		String[] mail = null;
+		
+		
+	  
+	    try{
+	    	Context initCtx = new InitialContext();
+			Context envCtx = (Context)initCtx.lookup("java:comp/env");
+			DataSource dataSource = (DataSource)envCtx.lookup("jdbc/mariadb1");
+			 
+			conn = dataSource.getConnection();
+			
+			String sql = "select subject, writer, mail, content from board1 where seq=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1,seq);
+			
+			 rs = pstmt.executeQuery();
+			 
+			if(rs.next()) {
+				subject = rs.getString("subject");
+				writer= rs.getString("writer");
+				content = rs.getString("content");
+				if(rs.getString("mail").equals("")) {
+					mail = new String[]	{" "," "};
+				} else{
+					mail = rs.getString("mail").split("@");
+				}
+					
+			}
+			
+	    } catch(NamingException e) {
+	    	System.out.println("에러" + e.getMessage());
+	    } catch(SQLException e) {
+	    	System.out.println("에러" + e.getMessage());
+	    }finally {
+	    	if(pstmt != null) pstmt.close();
+	    	if(conn != null) conn.close();
+	   	}
+	    
+	%>
+    
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,63 +74,33 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board.css">
-</head>
-<%
-	request.setCharacterEncoding("utf-8");
-	String seq = request.getParameter("seq");
-//	System.out.println(seq);
-	PreparedStatement pstmt = null;
-	Connection conn= null;
-	ResultSet rs = null;
-
-	String subject = "";
-	String content="";
-	String writer = "";
-	String password="";
-	String mail="";
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context) initCtx.lookup("java:comp/env");
-		DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb1");
-
-		conn = dataSource.getConnection();
-		//조회수 증가
-//		String sql = "UPDATE SET subject=?, content=? from board1 where seq=?";
-		String sql = "SELECT writer, subject, content, mail from board1 where seq=?";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, seq);
-		rs = pstmt.executeQuery();
-		if (rs.next()) {
-			writer = rs.getString("writer");
-			subject = rs.getString("subject");
-			content = rs.getString("content");
-			mail = rs.getString("mail");
+<script type="text/javascript">
+window.onload = function() {
+	document.getElementBYId('mbtn').onclick = function() {
+		alert('click');
+		if(document.mfrm.subject.trim() == '') {
+			alert('제목을 입력 하셔야합니다.');
+			return false;
+			
+		}else if(document.mfrm.password.trim() == '') {
+			alert('비밀번호를 입력 하셔야합니다.');
+			return false;
 		}
-	}catch (SQLException e){
-		e.printStackTrace();
-	}finally {
-		if(pstmt!=null){
-			pstmt.close();
-		}if (conn!=null){
-			conn.close();
-		}if (rs!=null){
-			rs.close();
-		}
-	}
-%>
+		document.mfrm.submit();
+	};
+};
+</script>
 
 <script type="text/javascript">
-	window.onload = function () {
-		document.getElementById('mbtn').onclick = function () {
-			// alert('click');
-			if (document.mfrm.password.value.trim()==='') {
-				alert('비밀번호 입력해주셔합니다');
-				return false;
-			}
+	window.onload = function() {
+		document.getElementById('mbtn').onclick = function() {
 			document.mfrm.submit();
-		}
-	}
+		};
+	};
 </script>
+
+</head>
+
 <body>
 <!-- 상단 디자인 -->
 <div class="con_title">
@@ -80,7 +108,8 @@
 	<p>HOME &gt; 게시판 &gt; <strong>게시판</strong></p>
 </div>
 <div class="con_txt">
-	<form action="" method="post" name="mfrm">
+	<form action="./board_modify1_ok.jsp" method="post" name="mfrm">
+	<input type="hidden" name="seq"  value="<%=seq %>"/>
 		<div class="contents_sub">	
 			<!--게시판-->
 			<div class="board_write">
@@ -99,11 +128,11 @@
 				</tr>
 				<tr>
 					<th>내용</th>
-					<td><textarea name="content" class="board_editor_area"><%=content%></textarea></td>
+					<td><textarea name="content" class="board_editor_area"></textarea></td>
 				</tr>
 				<tr>
 					<th>이메일</th>
-					<td><input type="text" name="mail1" value="<%=mail%>" class="board_view_input_mail"/></td>
+					<td><input type="text" name="mail1" value="<%=mail[0] %>" class="board_view_input_mail"/>@ <input type="text" name="mail2" value="<%=mail[1] %>" class="board_view_input_mail"/></td>
 				</tr>
 				</table>
 			</div>
@@ -111,10 +140,10 @@
 			<div class="btn_area">
 				<div class="align_left">
 					<input type="button" value="목록" class="btn_list btn_txt02" style="cursor: pointer;" onclick="location.href='board_list1.jsp'" />
-					<input type="button" value="보기" class="btn_list btn_txt02" style="cursor: pointer;" onclick="location.href='board_view1.jsp'" />
+					<input type="button" value="보기" class="btn_list btn_txt02" style="cursor: pointer;" onclick="location.href='board_view1.jsp?seq=<%=seq%>'" />
 				</div>
 				<div class="align_right">
-					<input type="button" id="mbtn" value="수정" class="btn_write btn_txt01" style="cursor: pointer;" onclick="location.href='board_list1.jsp?seq=<%=seq%>&password=<%=password%>&subject=<%=subject%>&content=<%=content%>'"/>
+					<input type="button" id="mbtn" value="수정" class="btn_write btn_txt01" style="cursor: pointer;" />
 				</div>
 			</div>
 			<!--//게시판-->
