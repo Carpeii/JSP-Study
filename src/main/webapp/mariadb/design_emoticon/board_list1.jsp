@@ -1,5 +1,14 @@
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="javax.naming.Context" %>
+<%@ page import="javax.naming.InitialContext" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="static org.apache.coyote.http11.Constants.a" %>
+<%@ page import="javax.naming.NamingException" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+		 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +18,73 @@
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board.css">
 </head>
+<%
+	PreparedStatement preparedStatement = null;
+	Connection connection = null;
+	ResultSet resultSet = null;
+	StringBuilder stringBuilderHtml = new StringBuilder();
+	String seq ="";
+	String subject="";
+	String writer="";
+	String emot="";
+	String hit="";
+	String wdate="";
+	int totalRecord= 0;
+	try {
+		Context initCtx = new InitialContext();
+		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
+		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb1" );
+		connection = dataSource.getConnection();
 
+		String sql = "SELECT seq, subject, writer, emot, date_format(wdate, '%Y-%m-%d') wdate, hit, datediff(now(), wdate) wgap from emot_board1 order by seq desc";
+		preparedStatement = connection.prepareStatement(sql);
+
+		resultSet = preparedStatement.executeQuery();
+
+		resultSet.last();
+		totalRecord = resultSet.getRow();
+		resultSet.beforeFirst();
+
+		while (resultSet.next()) {
+			seq = resultSet.getString("seq");
+			subject = resultSet.getString("subject");
+			writer = resultSet.getString("writer");
+			emot = resultSet.getString("emot");
+			hit = resultSet.getString("hit");
+			wdate = resultSet.getString("wdate");
+			int wgap = resultSet.getInt( "wgap" );
+
+			stringBuilderHtml.append("<tr>");
+			stringBuilderHtml.append("<td><img src=\"../../images/emoticon/emot" +emot + ".png\" width=\"15\"/></td>");
+			stringBuilderHtml.append("<td>"+seq+"</td>");
+
+			stringBuilderHtml.append("<td class=\"left\"><a href=\"board_view1.jsp?seq="+seq+"\">"+subject+"</a>&nbsp;");
+			if(wgap ==0){
+				stringBuilderHtml.append("<img src=\"../../images/icon_new.gif\" alt=\"NEW\">");
+			}
+			stringBuilderHtml.append("</td>");
+			stringBuilderHtml.append("<td>"+writer+"</td>");
+			stringBuilderHtml.append("<td>"+wdate+"</td>");
+			stringBuilderHtml.append("<td>"+hit+"</td>");
+			stringBuilderHtml.append("<td>&nbsp;</td>");
+			stringBuilderHtml.append("</tr>");
+		}
+	}catch (SQLException e) {
+		e.printStackTrace();
+	}catch (NamingException e){
+		e.printStackTrace();
+	}finally {
+		if (preparedStatement != null) {
+			preparedStatement.close();
+		}
+		if (connection != null) {
+			connection.close();
+		}
+		if (resultSet != null) {
+			resultSet.close();
+		}
+	}
+%>
 <body>
 <!-- 상단 디자인 -->
 <div class="con_title">
@@ -19,9 +94,8 @@
 <div class="con_txt">
 	<div class="contents_sub">
 		<div class="board_top">
-			<div class="bold">총 <span class="txt_orange">1</span>건</div>
+			<div class="bold">총 <span class="txt_orange"><%=totalRecord%></span>건</div>
 		</div>
-
 		<!--게시판-->
 		<div class="board">
 			<table>
@@ -34,24 +108,7 @@
 				<th width="5%">조회</th>
 				<th width="3%">&nbsp;</th>
 			</tr>
-			<tr>
-				<td><img src="../../images/emoticon/emot01.png" width="15"/></td>
-				<td>1</td>
-				<td class="left"><a href="board_view1.jsp">adfas</a>&nbsp;<img src="../../images/icon_new.gif" alt="NEW"></td>
-				<td>asdfa</td>
-				<td>2017-01-31</td>
-				<td>6</td>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td><img src="../../images/emoticon/emot01.png" width="15"/></td>
-				<td>1</td>
-				<td class="left"><a href="board_view1.jsp">adfas</a>&nbsp;<img src="../../images/icon_new.gif" alt="NEW"></td>
-				<td>asdfa</td>
-				<td>2017-01-31</td>
-				<td>6</td>
-				<td>&nbsp;</td>
-			</tr>			
+			<%=stringBuilderHtml.toString()%>
 			</table>
 		</div>
 		
