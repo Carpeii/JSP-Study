@@ -11,7 +11,7 @@
 	to.setSeq( request.getParameter( "seq" ) );
 	
 	BoardDAO dao = new BoardDAO();
-	to = dao.boardView( to );
+	to = dao.boardModify( to );
 	
 	String seq = to.getSeq();
 	String subject = to.getSubject();
