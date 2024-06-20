@@ -10,64 +10,28 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
-<%@ page import="java.sql.SQLException" %>	
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="study.BoardDao" %>
+<%@ page import="study.BoardTo" %>
 
 <%
 	request.setCharacterEncoding( "utf-8" );
 
 	String seq = request.getParameter( "seq" );
-	
-	String subject = "";
-	String writer = "";
-	String mail = "";
-	String wip = "";
-	String wdate = "";
-	String hit = "";
-	String content = "";
-	String emot = "";
-	
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
-	
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
 
-		conn = dataSource.getConnection();
-		
-		String sql = "update emot_board1 set hit=hit+1 where seq=?";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, seq );
-		
-		pstmt.executeUpdate();
-		
-		sql = "select subject, writer, mail, wip, wdate, hit, content, emot from emot_board1 where seq=?";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, seq );
-		
-		rs = pstmt.executeQuery();
-		if( rs.next() ) {
-			subject = rs.getString( "subject" );
-			writer = rs.getString( "writer" );
-			mail = rs.getString( "mail" );
-			wip = rs.getString( "wip" );
-			wdate = rs.getString( "wdate" );
-			hit = rs.getString( "hit" );
-			content = rs.getString( "content" ).replaceAll( "\n", "<br />" );
-			emot = rs.getString( "emot" );
-		}
-		
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( rs != null ) rs.close();
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
-	}
+	BoardDao boardDao = new BoardDao();
+	BoardTo to = new BoardTo();
+
+	to = boardDao.boardView(seq);
+
+	String subject = to.getSubject();
+	String writer = to.getWriter();
+	String mail = to.getMail();
+	String wip = to.getWip();
+	String wdate = to.getWdate();
+	String hit = to.getHit();
+	String content = to.getContent().replaceAll( "\n", "<br />" );
+	String emot = to.getEmot();
 %>
 
 <!DOCTYPE html>

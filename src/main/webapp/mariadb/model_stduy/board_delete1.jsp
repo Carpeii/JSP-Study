@@ -10,46 +10,22 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
-<%@ page import="java.sql.SQLException" %>	
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="study.BoardDao" %>
+<%@ page import="study.BoardTo" %>
 
 <%
 	request.setCharacterEncoding( "utf-8" );
 
 	String seq = request.getParameter( "seq" );
-	
-	String subject = "";
-	String writer = "";
-	
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
-	
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
-		
-		conn = dataSource.getConnection();
-		
-		String sql = "select subject, writer from emot_board1 where seq=?";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, seq );
-		
-		rs = pstmt.executeQuery();
-		if( rs.next() ) {
-			subject = rs.getString( "subject" );
-			writer = rs.getString( "writer" );
-		}
-		
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( rs != null ) rs.close();
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
-	}
+
+	BoardDao boardDao = new BoardDao();
+	BoardTo boardTo = new BoardTo();
+
+	boardTo = boardDao.boardDelete(seq);
+
+	String subject = boardTo.getSubject();
+	String writer = boardTo.getWriter();
 %>
 
 <!DOCTYPE html>

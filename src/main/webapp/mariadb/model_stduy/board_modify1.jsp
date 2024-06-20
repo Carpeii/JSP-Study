@@ -10,56 +10,29 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
-<%@ page import="java.sql.SQLException" %>	
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="study.BoardDao" %>
+<%@ page import="study.BoardTo" %>
 
 <%
 	request.setCharacterEncoding( "utf-8" );
 
 	String seq = request.getParameter( "seq" );
-	
-	String subject = "";
-	String writer = "";
+
+	BoardDao boardDao = new BoardDao();
+	BoardTo to = boardDao.boardModify(seq);
+
+	String subject = to.getSubject();
+	String writer = to.getWriter();
 	String[] mail = null;
-	String content = "";
-	String emot = "";
-	
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
-	
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
-		
-		conn = dataSource.getConnection();
-		
-		String sql = "select subject, writer, mail, content, emot from emot_board1 where seq=?";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, seq );
-		
-		rs = pstmt.executeQuery();
-		if( rs.next() ) {
-			subject = rs.getString( "subject" );
-			writer = rs.getString( "writer" );
-			if( rs.getString( "mail" ).equals( "" ) ) {
-				mail = new String[] { "", "" };
-			} else {
-				mail = rs.getString( "mail" ).split( "@" );
-			}
-			content = rs.getString( "content" ) == null ? "" : rs.getString( "content" );
-			emot = rs.getString( "emot" );
-		}
-		
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( rs != null ) rs.close();
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
+	String emot = to.getEmot();
+
+	if( to.getMail().equals( "" ) ) {
+		mail = new String[] { "", "" };
+	} else {
+		mail = 	to.getMail().split( "@" );
 	}
+	String content = to.getContent() == null ? "" : to.getContent();
 %>
 
 <!DOCTYPE html>
