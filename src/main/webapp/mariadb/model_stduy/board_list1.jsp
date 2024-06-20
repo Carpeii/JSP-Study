@@ -14,49 +14,58 @@
 <%@ page import="study.BoardDao" %>
 <%@ page import="study.BoardTo" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="study.BoardListTo" %>
 <%
-	request.setCharacterEncoding("UTF-8");
-	int cpage = 1;
+	request.setCharacterEncoding( "utf-8" );
 
-	if (request.getParameter("cpage") != null && request.getParameter("cpage").equals("")) {
-		cpage = Integer.parseInt(request.getParameter("cpage"));
+	int cpage = 1;
+	if( request.getParameter( "cpage" ) != null && !request.getParameter("cpage").equals("") ) {
+		cpage = Integer.parseInt( request.getParameter( "cpage" ) );
 	}
 
-	BoardDao boardDao = new BoardDao();
-	ArrayList<BoardTo> boardLists = boardDao.boardList(cpage);
-	int totalRecord = boardLists.size();
+	BoardListTo listTo = new BoardListTo();
+	listTo.setCpage( cpage );
 
-	int recordPerPage = 10;
-	int totalPage = 0;
-	int blockPerPage =5;
+	BoardDao dao = new BoardDao();
+	listTo = dao.boardList(listTo);
+
+	// paging
+	int totalRecord = listTo.getTotalRecord();
+	int totalPage = listTo.getTotalPage();
+
+	int blockPerPage = listTo.getBlockPerPage();
+	int startBlock = listTo.getStartBlock();
+	int endBlock = listTo.getEndBlock();
+
+	// 실제 데이터
+	ArrayList<BoardTo> boardLists = listTo.getBoardLists();
 
 	StringBuilder sbHtml = new StringBuilder();
 
-	for (BoardTo to : boardLists) {
+	for( BoardTo to : boardLists ) {
 		String seq = to.getSeq();
 		String subject = to.getSubject();
 		String writer = to.getWriter();
-		String emot = to.getEmot();
 		String wdate = to.getWdate();
 		String hit = to.getHit();
 		int wgap = to.getWgap();
 
-		sbHtml.append("<tr>");
-		sbHtml.append("<td><img src='../../images/emoticon/emot" + emot + ".png' width='15' /></td>");
-		sbHtml.append("<td>" + seq + "</td>");
-		sbHtml.append("<td class='left'>");
-		sbHtml.append("	<a href='board_view1.jsp?seq=" + seq + "'>" + subject + "</a>&nbsp;");
+		sbHtml.append( "<tr>" );
+		sbHtml.append( "<td>&nbsp;</td>" );
+		sbHtml.append( "<td>" + seq + "</td>" );
 
-		if (wgap == 0) {
-			sbHtml.append("	<img src='../../images/icon_new.gif' alt='NEW'>");
+		sbHtml.append( "<td class='left'>" );
+		sbHtml.append( "	<a href='board_view1.jsp?cpage=" + cpage + "&seq=" + seq + "'>" + subject + "</a>" );
+		if( wgap == 0 ) {
+			sbHtml.append( "	&nbsp;<img src='../../images/icon_new.gif' alt='NEW'>" );
 		}
+		sbHtml.append( "</td>" );
 
-		sbHtml.append("</td>");
-		sbHtml.append("<td>" + writer + "</td>");
-		sbHtml.append("<td>" + wdate + "</td>");
-		sbHtml.append("<td>" + hit + "</td>");
-		sbHtml.append("<td>&nbsp;</td>");
-		sbHtml.append("</tr>");
+		sbHtml.append( "<td>" + writer + "</td>" );
+		sbHtml.append( "<td>" + wdate + "</td>" );
+		sbHtml.append( "<td>" + hit + "</td>" );
+		sbHtml.append( "<td>&nbsp;</td>" );
+		sbHtml.append( "</tr>" );
 	}
 %>
 
@@ -103,66 +112,59 @@
 
 		<div class="btn_area">
 			<div class="align_right">
-				<input type="button" value="쓰기" class="btn_write btn_txt01"
-					   style="cursor: pointer;"
-					   onclick="location.href='board_write1.jsp?cpage=<%=cpage %>'" />
+				<input type="button" value="쓰기" class="btn_write btn_txt01" style="cursor: pointer;" onclick="location.href='board_write1.jsp?cpage=<%=cpage %>'" />
 			</div>
 
-			<%
-				int startBlock = cpage - (cpage - 1) % blockPerPage;
-				int endBlock = cpage - (cpage - 1) % blockPerPage + blockPerPage - 1;
-				if (endBlock >= totalPage) {
-					endBlock = totalPage;
-				}
-			%>
 			<!--페이지넘버-->
 			<div class="paginate_regular">
 				<div align="absmiddle">
 					<%
-						if (startBlock == 1) {
-							out.println("<span><a>&lt;&lt;</a></span>");
+						if( startBlock == 1 ) {
+							out.println( "<span><a>&lt;&lt;</a></span>" );
 						} else {
-							out.println("<span><a href='board_list1.jsp?cpage="+(startBlock - blockPerPage)+"'>&lt;&lt;</a></span>");
+							out.println( "<span><a href='board_list1.jsp?cpage=" + ( startBlock - blockPerPage )+ "'>&lt;&lt;</a></span>" );
 						}
-						out.println("&nbsp;");
 
-						if (cpage == 1) {
-							out.println("<span><a>&lt;</a></span>");
+						out.println( "&nbsp;" );
+
+						if( cpage == 1 ) {
+							out.println( "<span><a>&lt;</a></span>" );
 						} else {
-							out.println("<span><a href='board_list1.jsp?cpage=" + (cpage - 1) + "'>&lt;</a></span>");
+							out.println( "<span><a href='board_list1.jsp?cpage=" + (cpage -1) + "'>&lt;</a></span>" );
 						}
-						out.println("&nbsp;&nbsp;");
 
-						for (int i = startBlock; i <= endBlock; i++) {
-							if (i == cpage) {
-								out.println("<span><a>[" + i + "]</a></span>");
+						out.println( "&nbsp;&nbsp;" );
+
+						for( int i=startBlock ; i<=endBlock ; i++ ) {
+							if( i == cpage ) {
+								out.println( "<span><a>[" + i + "]</a></span>" );
 							} else {
-								out.println("<span><a href= 'board_list1.jsp?cpage=" + i + "'>" + i + "</a></span>");
+								out.println( "<span><a href='board_list1.jsp?cpage=" + i + "'>" + i + "</a></span>" );
 							}
 						}
 
-						out.println("&nbsp;&nbsp;");
-						if (cpage == totalPage) {
-							out.println("<span><a>&gt;</a></span>");
+						out.println( "&nbsp;&nbsp;" );
+
+						if( cpage == totalPage ) {
+							out.println( "<span><a>&gt;</a></span>" );
 						} else {
-							out.println("<span><a href = 'board_list1.jsp?cpage=" + (cpage + 1) + "'>&gt;</a></span>");
+							out.println( "<span><a href='./board_list1.jsp?cpage=" + ( cpage + 1 )+ "'>&gt;</a></span>" );
 						}
 
-						if (endBlock == totalPage) {
-							out.println("<span><a>&gt;&gt;</a></span>");
-						} else {
-							out.println("<span><a href='./board_list1.jsp?cpage=" + ( startBlock + blockPerPage) + "'>&gt;&gt;</a></span>");
-						}
+						out.println( "&nbsp;" );
 
+						if( endBlock == totalPage ) {
+							out.println( "<span><a>&gt;&gt;</a></span>" );
+						} else {
+							out.println( "<span><a href='./board_list1.jsp?cpage=" + ( startBlock + blockPerPage ) + "'>&gt;&gt;</a></span>" );
+						}
 					%>
-					&nbsp;&nbsp;
-					&nbsp;
 				</div>
 			</div>
 			<!--//페이지넘버-->
+
 		</div>
 		<!--//게시판-->
-
 	</div>
 </div>
 <!--//하단 디자인 -->

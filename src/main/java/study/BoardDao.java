@@ -112,17 +112,16 @@ public class BoardDao {
         return flag;
     }
 
-    public ArrayList<BoardTo> boardList(int cpage) {
+    public BoardListTo boardList(BoardListTo listTo) {
         ArrayList<BoardTo> boardList = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
-        int totalRecord = 0;
+        int cpage = listTo.getCpage();
+        int recordPerPage = listTo.getRecordPerPage();
+        int blockPerPage = listTo.getBlockPerPage();
 
-        int recordPerPage = 10;
-        int totalPage = 0;
-        int blockPerPage = 5;
         try {
             conn = dataSource.getConnection();
             String sql = "select seq, subject, writer, emot, date_format(wdate, '%Y-%m-%d') wdate, hit, datediff(now(), wdate) wgap from emot_board1 order by seq desc";
@@ -131,17 +130,16 @@ public class BoardDao {
             rs = pstmt.executeQuery();
 
             rs.last();
-            totalRecord = rs.getRow();
+            listTo.setTotalRecord( rs.getRow());
             rs.beforeFirst();
 
-            rs = pstmt.executeQuery();
+            listTo.setTotalPage( ( ( listTo.getTotalRecord() - 1 ) / recordPerPage ) + 1 );
 
             //읽을 위치 지정
-            int skip = (cpage - 1) * recordPerPage;
+            int skip = ( cpage - 1 ) * recordPerPage;
             //읽을위치로 커서 이동
-            if (skip != 0) {
-                rs.absolute(skip);
-            }
+            if( skip != 0 ) rs.absolute( skip );
+
             for (int i = 0; i < recordPerPage && rs.next(); i++) {
                 BoardTo to = new BoardTo();
                 to.setSeq(rs.getString("seq"));
@@ -153,10 +151,17 @@ public class BoardDao {
                 to.setWgap(rs.getInt("wgap"));
                 boardList.add(to);
             }
+            listTo.setBoardLists(boardList);
+
+            listTo.setStartBlock( cpage - ( cpage - 1 ) % blockPerPage );
+            listTo.setEndBlock( cpage - ( cpage - 1 ) % blockPerPage + blockPerPage - 1 );
+            if( listTo.getEndBlock() >= listTo.getTotalPage() ) {
+                listTo.setEndBlock( listTo.getTotalPage() );
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return boardList;
+        return listTo;
     }
 
     public BoardTo boardModify(String seq) {
