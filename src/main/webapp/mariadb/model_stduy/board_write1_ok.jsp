@@ -35,8 +35,8 @@
 		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
 		
 		conn = dataSource.getConnection();
-		
-		String sql = "insert into emot_board1 values (?, ?, ?, password(?), ?, ?, 0, ?, now())";
+
+		String sql = "insert into emot_board1 values (0, ?, ?, ?, password(?), ?, ?, 0, ?, now())";
 		pstmt = conn.prepareStatement( sql );
 		pstmt.setString( 1, subject );
 		pstmt.setString( 2, writer );
