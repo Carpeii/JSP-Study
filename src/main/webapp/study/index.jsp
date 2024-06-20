@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="pack1.MemberTo" %>
+<%@ page import="simple1.MemberTo" %>
 <html>
 <head>
     <title>Title</title>

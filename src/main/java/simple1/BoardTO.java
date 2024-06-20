@@ -1,6 +1,6 @@
-package pack1;
+package simple1;
 
-public class BoardDto {
+public class BoardTO {
     private String seq;
     private String subject;
     private String writer;
@@ -11,6 +11,7 @@ public class BoardDto {
     private String hit;
     private String wip;
     private String wdate;
+    private int wgap;
 
     public String getSeq() {
         return seq;
@@ -90,5 +91,13 @@ public class BoardDto {
 
     public void setWdate(String wdate) {
         this.wdate = wdate;
+    }
+
+    public int getWgap() {
+        return wgap;
+    }
+
+    public void setWgap(int wgap) {
+        this.wgap = wgap;
     }
 }

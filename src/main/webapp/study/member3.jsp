@@ -11,7 +11,7 @@
     <title>Title</title>
 </head>
 <body>
-    <jsp:useBean id="to" class="pack1.MemberTo"/>
+    <jsp:useBean id="to" class="simple1.MemberTo"/>
 <%
     to.setName("tester");
 

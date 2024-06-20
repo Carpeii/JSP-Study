@@ -1,55 +1,21 @@
 ﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
-<%@ page import="javax.naming.Context" %>
-<%@ page import="javax.naming.InitialContext" %>
-<%@ page import="javax.naming.NamingException" %>
-
-<%@ page import="javax.sql.DataSource" %>
-
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.PreparedStatement" %>
-<%@ page import="java.sql.ResultSet" %>
-<%@ page import="java.sql.SQLException" %>	
+<%@ page import="simple1.BoardDAO" %>
+<%@ page import="simple1.BoardTO" %>
 
 <%
 	request.setCharacterEncoding( "utf-8" );
-
-	String seq = request.getParameter( "seq" );
 	
-	String subject = "";
-	String writer = "";
+	BoardTO to = new BoardTO();
+	to.setSeq( request.getParameter( "seq" ) );
 	
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
+	BoardDAO dao = new BoardDAO();
+	to = dao.boardDelete( to );
 	
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb1" );
-		
-		conn = dataSource.getConnection();
-		
-		String sql = "select subject, writer from emot_board1 where seq=?";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, seq );
-		
-		rs = pstmt.executeQuery();
-		if( rs.next() ) {
-			subject = rs.getString( "subject" );
-			writer = rs.getString( "writer" );
-		}
-		
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( rs != null ) rs.close();
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
-	}
+	String seq = to.getSeq();
+	String subject = to.getSubject();
+	String writer = to.getWriter();	
 %>
 
 <!DOCTYPE html>
@@ -67,6 +33,7 @@
 				alert( '비밀번호를 입력하셔야 합니다.' );
 				return false;
 			}
+			
 			document.dfrm.submit();
 		};
 	};
@@ -80,7 +47,7 @@
 	<p>HOME &gt; 게시판 &gt; <strong>게시판</strong></p>
 </div>
 <div class="con_txt">
-	<form action="board_delete1_ok.jsp" method="post" name="dfrm">
+	<form action="./board_delete1_ok.jsp" method="post" name="dfrm">
 		<input type="hidden" name="seq" value="<%=seq %>" />
 		<div class="contents_sub">	
 			<!--게시판-->
@@ -88,15 +55,15 @@
 				<table>
 				<tr>
 					<th class="top">글쓴이</th>
-					<td class="top" colspan="3"><input type="text" name="writer" value="<%=writer %>" class="board_view_input_mail" maxlength="5" readonly/></td>
+					<td class="top"><input type="text" name="writer" value="<%=writer %>" class="board_view_input_mail" maxlength="5" readonly/></td>
 				</tr>
 				<tr>
 					<th>제목</th>
-					<td colspan="3"><input type="text" name="subject" value="<%=subject %>" class="board_view_input" readonly/></td>
+					<td><input type="text" name="subject" value="<%=subject %>" class="board_view_input" readonly/></td>
 				</tr>
 				<tr>
 					<th>비밀번호</th>
-					<td colspan="3"><input type="password" name="password" value="" class="board_view_input_mail"/></td>
+					<td><input type="password" name="password" value="" class="board_view_input_mail"/></td>
 				</tr>
 				</table>
 			</div>

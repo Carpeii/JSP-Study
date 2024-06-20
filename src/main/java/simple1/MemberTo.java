@@ -1,4 +1,4 @@
-package pack1;
+package simple1;
 
 public class MemberTo {
     private String name;
