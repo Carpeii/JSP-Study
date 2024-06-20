@@ -11,7 +11,9 @@
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="java.sql.SQLException" %>
-
+<%@ page import="study.BoardDao" %>
+<%@ page import="study.BoardTo" %>
+<%@ page import="java.util.ArrayList" %>
 <%
 	request.setCharacterEncoding("UTF-8");
 	int cpage = 1;
@@ -19,76 +21,42 @@
 	if (request.getParameter("cpage") != null && request.getParameter("cpage").equals("")) {
 		cpage = Integer.parseInt(request.getParameter("cpage"));
 	}
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
-	
-	int totalRecord = 0;
+
+	BoardDao boardDao = new BoardDao();
+	ArrayList<BoardTo> boardLists = boardDao.boardList(cpage);
+	int totalRecord = boardLists.size();
 
 	int recordPerPage = 10;
 	int totalPage = 0;
 	int blockPerPage =5;
-	
-	StringBuilder sbHtml = new StringBuilder();
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb1" );
-		
-		conn = dataSource.getConnection();
-		
-		String sql = "select seq, subject, writer, emot, date_format(wdate, '%Y-%m-%d') wdate, hit, datediff(now(), wdate) wgap from emot_board1 order by seq desc";
-		pstmt = conn.prepareStatement( sql );
-		
-		rs = pstmt.executeQuery();
-		
-		rs.last();
-		totalRecord = rs.getRow();
-		rs.beforeFirst();
-		
-		rs = pstmt.executeQuery();
 
-		//읽을 위치 지정
-		int skip = (cpage-1)*recordPerPage;
-		//읽을위치로 커서 이동
-		if(skip!=0){
-			rs.absolute(skip);
+	StringBuilder sbHtml = new StringBuilder();
+
+	for (BoardTo to : boardLists) {
+		String seq = to.getSeq();
+		String subject = to.getSubject();
+		String writer = to.getWriter();
+		String emot = to.getEmot();
+		String wdate = to.getWdate();
+		String hit = to.getHit();
+		int wgap = to.getWgap();
+
+		sbHtml.append("<tr>");
+		sbHtml.append("<td><img src='../../images/emoticon/emot" + emot + ".png' width='15' /></td>");
+		sbHtml.append("<td>" + seq + "</td>");
+		sbHtml.append("<td class='left'>");
+		sbHtml.append("	<a href='board_view1.jsp?seq=" + seq + "'>" + subject + "</a>&nbsp;");
+
+		if (wgap == 0) {
+			sbHtml.append("	<img src='../../images/icon_new.gif' alt='NEW'>");
 		}
-		for(int i = 0; i < recordPerPage && rs.next(); i++) {
-			String seq = rs.getString( "seq" );
-			String subject = rs.getString( "subject" );
-			String writer = rs.getString( "writer" );
-			String emot = rs.getString( "emot" );
-			String wdate = rs.getString( "wdate" );
-			String hit = rs.getString( "hit" );
-			int wgap = rs.getInt( "wgap" );
-			
-			sbHtml.append( "<tr>" );
-			sbHtml.append( "<td><img src='../../images/emoticon/emot" + emot + ".png' width='15' /></td>" );
-			sbHtml.append( "<td>" + seq + "</td>" );
-			sbHtml.append( "<td class='left'>" );
-			sbHtml.append( "	<a href='board_view1.jsp?seq=" + seq + "'>" + subject + "</a>&nbsp;" );
-			
-			if( wgap == 0 ) {
-				sbHtml.append( "	<img src='../../images/icon_new.gif' alt='NEW'>" );
-			}
-			
-			sbHtml.append( "</td>");
-			sbHtml.append( "<td>" + writer + "</td>" );
-			sbHtml.append( "<td>" + wdate + "</td>" );
-			sbHtml.append( "<td>" + hit + "</td>" );
-			sbHtml.append( "<td>&nbsp;</td>" );
-			sbHtml.append( "</tr>" );
-		}
-		
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( rs != null ) rs.close();
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
+
+		sbHtml.append("</td>");
+		sbHtml.append("<td>" + writer + "</td>");
+		sbHtml.append("<td>" + wdate + "</td>");
+		sbHtml.append("<td>" + hit + "</td>");
+		sbHtml.append("<td>&nbsp;</td>");
+		sbHtml.append("</tr>");
 	}
 %>
 

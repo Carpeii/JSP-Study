@@ -33,8 +33,8 @@
 	try {
 		Context initCtx = new InitialContext();
 		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb1" );
-		
+		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
+
 		conn = dataSource.getConnection();
 		
 		String sql = "update emot_board1 set hit=hit+1 where seq=?";
