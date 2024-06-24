@@ -16,7 +16,7 @@
 <%@ page import="java.io.File" %>
 
 <%
-	String uploadPath = "C:/Java/jsp-workspace/UploadBoardEx01/src/main/webapp/upload";
+	String uploadPath = "/Users/kimjiwoong/javaprojects/myJSP/src/main/webapp/upload";
 	int maxFileSize = 2 * 1024 * 1024;
 	String encType = "utf-8";
 	
@@ -53,16 +53,15 @@
 	
 		conn = dataSource.getConnection();
 	
-		String sql = "insert into pds_board1 values ( 0, ?, ?, ?, password( ? ), ?, ?, ?, 0, ?, now() )";
+		String sql = "insert into album values ( 0, ?, ?, ?, password( ? ), ?, ?, 0, ?, now() )";
 		pstmt = conn.prepareStatement( sql );
 		pstmt.setString( 1, subject );
 		pstmt.setString( 2, writer );
 		pstmt.setString( 3, mail );
 		pstmt.setString( 4, password );
-		pstmt.setString( 5, content );
-		pstmt.setString( 6, filename );
-		pstmt.setLong( 7, filesize );
-		pstmt.setString( 8, wip );
+		pstmt.setString( 5, filename );
+		pstmt.setString( 6, content );
+		pstmt.setString( 7, wip );
 	
 		if( pstmt.executeUpdate() == 1 ) {
 			flag = 0;
