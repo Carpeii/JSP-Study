@@ -61,12 +61,16 @@ public class BoardDAO {
         return flag;
     }
 
-    public ArrayList<BoardTO> boardList() {
+    public BoardListTo boardList(BoardListTo listTo) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
-        ArrayList<BoardTO> boardLists = new ArrayList<BoardTO>();
+        ArrayList<BoardTO> boardLists = new ArrayList<>();
+
+        int cpage = listTo.getCpage();
+        int recordPerPage = listTo.getRecordPerPage();
+        int blockPerPage = listTo.getBlockPerPage();
 
         try {
             conn = this.dataSource.getConnection();
@@ -76,7 +80,15 @@ public class BoardDAO {
 
             rs = pstmt.executeQuery();
 
-            while( rs.next() ) {
+            rs.last();
+            listTo.setTotalRecord( rs.getRow());
+            rs.beforeFirst();
+            listTo.setTotalPage( ( ( listTo.getTotalRecord() - 1 ) / recordPerPage ) + 1 );
+            int skip = ( cpage - 1 ) * recordPerPage;
+            //읽을위치로 커서 이동
+            if( skip != 0 ) rs.absolute( skip );
+
+            for (int i = 0; i < recordPerPage && rs.next(); i++) {
                 BoardTO to = new BoardTO();
                 to.setSeq( rs.getString( "seq" ) );
                 to.setSubject( rs.getString( "subject" ) );
@@ -87,6 +99,13 @@ public class BoardDAO {
                 to.setFileName(rs.getString( "filename" ) );
                 boardLists.add( to );
             }
+            listTo.setBoardLists(boardLists);
+
+            listTo.setStartBlock( cpage - ( cpage - 1 ) % blockPerPage );
+            listTo.setEndBlock( cpage - ( cpage - 1 ) % blockPerPage + blockPerPage - 1 );
+            if( listTo.getEndBlock() >= listTo.getTotalPage() ) {
+                listTo.setEndBlock( listTo.getTotalPage() );
+            }
 
         } catch( SQLException e ) {
             System.out.println( "[에러] " + e.getMessage() );
@@ -95,7 +114,7 @@ public class BoardDAO {
             if( pstmt != null ) try { pstmt.close(); } catch( SQLException e ) {}
             if( conn != null ) try { conn.close(); } catch( SQLException e ) {}
         }
-        return boardLists;
+        return listTo;
     }
 
     public BoardTO boardView(BoardTO to) {

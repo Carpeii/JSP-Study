@@ -46,12 +46,6 @@
 	to.setPassword(password);
 	to.setContent(content);
 
-	System.out.println(seq);
-	System.out.println(subject);
-	System.out.println(mail);
-	System.out.println(password);
-	System.out.println(content);
-
 	int flag= dao.boardModifyOk(to, newfilename);
 	
 	out.println( "<script type='text/javascript'>" );

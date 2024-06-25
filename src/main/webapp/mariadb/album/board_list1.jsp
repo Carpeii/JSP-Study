@@ -1,14 +1,31 @@
 <%@ page import="album.BoardDAO" %>
 <%@ page import="album.BoardTO" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="album.BoardListTo" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 		 pageEncoding="UTF-8"%>
 
 <%
 	BoardDAO dao = new BoardDAO();
-	ArrayList<BoardTO> boardLists = dao.boardList();
 
-	int totalRecord = boardLists.size();
+	int cpage = 1;
+	if( request.getParameter( "cpage" ) != null && !request.getParameter("cpage").equals("") ) {
+		cpage = Integer.parseInt( request.getParameter( "cpage" ) );
+	}
+	BoardListTo listTo = new BoardListTo();
+	listTo.setCpage( cpage );
+	listTo = dao.boardList(listTo);
+
+	// paging
+	int totalRecord = listTo.getTotalRecord();
+	int totalPage = listTo.getTotalPage();
+
+	int blockPerPage = listTo.getBlockPerPage();
+	int startBlock = listTo.getStartBlock();
+	int endBlock = listTo.getEndBlock();
+
+	// 실제 데이터
+	ArrayList<BoardTO> boardLists = listTo.getBoardLists();
 
 	StringBuilder sbHtml = new StringBuilder();
 
@@ -96,6 +113,53 @@
 				<input type="button" value="쓰기" class="btn_write btn_txt01" style="cursor: pointer;" onclick="location.href='board_write1.jsp'" />
 			</div>
 		</div>
+		<!--페이지넘버-->
+		<div class="paginate_regular">
+			<div align="absmiddle">
+				<%
+					if( startBlock == 1 ) {
+						out.println( "<span><a>&lt;&lt;</a></span>" );
+					} else {
+						out.println( "<span><a href='board_list1.jsp?cpage=" + ( startBlock - blockPerPage )+ "'>&lt;&lt;</a></span>" );
+					}
+
+					out.println( "&nbsp;" );
+
+					if( cpage == 1 ) {
+						out.println( "<span><a>&lt;</a></span>" );
+					} else {
+						out.println( "<span><a href='board_list1.jsp?cpage=" + (cpage -1) + "'>&lt;</a></span>" );
+					}
+
+					out.println( "&nbsp;&nbsp;" );
+
+					for( int i=startBlock ; i<=endBlock ; i++ ) {
+						if( i == cpage ) {
+							out.println( "<span><a>[" + i + "]</a></span>" );
+						} else {
+							out.println( "<span><a href='board_list1.jsp?cpage=" + i + "'>" + i + "</a></span>" );
+						}
+					}
+
+					out.println( "&nbsp;&nbsp;" );
+
+					if( cpage == totalPage ) {
+						out.println( "<span><a>&gt;</a></span>" );
+					} else {
+						out.println( "<span><a href='./board_list1.jsp?cpage=" + ( cpage + 1 )+ "'>&gt;</a></span>" );
+					}
+
+					out.println( "&nbsp;" );
+
+					if( endBlock == totalPage ) {
+						out.println( "<span><a>&gt;&gt;</a></span>" );
+					} else {
+						out.println( "<span><a href='./board_list1.jsp?cpage=" + ( startBlock + blockPerPage ) + "'>&gt;&gt;</a></span>" );
+					}
+				%>
+			</div>
+		</div>
+		<!--//페이지넘버-->
 		<!--//게시판-->			
   	</div>
 </div>

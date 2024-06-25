@@ -18,7 +18,7 @@ public class BoardListTo {
     public BoardListTo() {
         // TODO Auto-generated constructor stub
         this.cpage = 1;
-        this.recordPerPage = 10;
+        this.recordPerPage = 5;
         this.blockPerPage = 5;
         this.totalPage = 1;
         this.totalRecord = 0;
