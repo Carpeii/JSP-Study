@@ -86,7 +86,7 @@
 				<tr>
 					<th>이미지</th>
 					<td colspan="3">
-						기존 이미지 : <br /><img src="../../upload/<%=filename%>"> alt="NEW"><br />
+						기존 이미지 : <br /><img src="../../upload/<%=filename%>" alt="NEW"><br />
 						<input type="file" name="upload" value="" /><br /><br />
 					</td>
 				</tr>

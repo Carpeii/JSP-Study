@@ -146,7 +146,7 @@ public class BoardDAO {
         try {
             conn = dataSource.getConnection();
 
-            String sql = "select subject, writer, mail, content from board1 where seq=?";
+            String sql = "select subject, writer, mail ,filename ,content from album where seq=?";
             pstmt = conn.prepareStatement( sql );
             pstmt.setString( 1, to.getSeq() );
 
@@ -156,6 +156,7 @@ public class BoardDAO {
                 to.setSubject( rs.getString( "subject" ) );
                 to.setWriter( rs.getString( "writer" ) );
                 to.setMail( rs.getString("mail") );
+                to.setFileName(rs.getString("filename"));
                 to.setContent( rs.getString( "content" ) );
             }
         } catch( SQLException e ) {
