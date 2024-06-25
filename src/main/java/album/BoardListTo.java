@@ -5,13 +5,13 @@ import album.BoardTO;
 import java.util.ArrayList;
 
 public class BoardListTo {
-    private int cpage;
-    private int recordPerPage;
-    private int blockPerPage;
-    private int totalPage;
-    private int totalRecord;
-    private int startBlock;
-    private int endBlock;
+    private int cpage;      //현재 페이지
+    private int recordPerPage;    //한 페이지에 표시될 항목 수
+    private int blockPerPage;   //페이지 네비게이션에서 한번에 표시될 번호의 개수
+    private int totalPage;  //전체 페이지 개수
+    private int totalRecord;    //전체 레코드의 수
+    private int startBlock; //현재 보여지는 페이지 블록의 시작값
+    private int endBlock;//현재 보여지는 페이지 블록의 마지막 페이지 번호
 
     private ArrayList<BoardTO> boardLists;
 
