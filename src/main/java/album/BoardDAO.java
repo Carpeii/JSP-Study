@@ -85,8 +85,6 @@ public class BoardDAO {
                 to.setWgap( rs.getInt( "wgap" ) );
                 to.setFileName(rs.getString( "filename" ) );
                 boardLists.add( to );
-
-                System.out.println(to.getSubject());
             }
 
         } catch( SQLException e ) {
