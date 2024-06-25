@@ -60,7 +60,8 @@
 		</p>
 	</div> 
 
-	<form action="./board_modify1_ok.jsp" method="post" name="mfrm">
+	<form action="./board_modify1_ok.jsp" method="post" name="mfrm" enctype="multipart/form-data">
+		<input type="hidden" name="seq" value="<%=seq%>">
 		<div class="contents_sub">
 		<!--게시판-->
 			<div class="board_write">

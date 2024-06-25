@@ -4,6 +4,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -169,37 +170,126 @@ public class BoardDAO {
 
         return to;
     }
+    public String getFileName(BoardTO to){
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
-    public int boardModifyOk(BoardTO to) {
+        String filename = "";
+        try {
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            DataSource dataSource = (DataSource) envCtx.lookup("jdbc/mariadb2");
+
+            conn = dataSource.getConnection();
+
+            String sql = "select filename from album where seq=?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, to.getSeq());
+
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                filename = rs.getString("filename");
+            }
+        }catch (NamingException e){
+            e.printStackTrace();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        return filename;
+    }
+    public int boardModifyOk(BoardTO to, String newFileName) {
+        String uploadPath = "/Users/kimjiwoong/javaprojects/myJSP/src/main/webapp/upload";
         Connection conn = null;
         PreparedStatement pstmt = null;
 
         int flag = 2;
-        try {
-            conn = this.dataSource.getConnection();
 
-            String sql = "update board1 set subject=?, mail=?, content=? where seq=? and password = password( ? )";
-            pstmt = conn.prepareStatement( sql );
-            pstmt.setString( 1, to.getSubject() );
-            pstmt.setString( 2, to.getMail() );
-            pstmt.setString( 3, to.getContent() );
-            pstmt.setString( 4, to.getSeq() );
-            pstmt.setString( 5, to.getPassword() );
+        try {
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
+            DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
+
+            conn = dataSource.getConnection();
+
+            String oldFileName = this.getFileName(to);
+            // update
+            if( newFileName != null ) {
+                String sql = "update album set subject=?, mail=?, content=?, filename=? where seq=? and password=password( ? )";
+
+                pstmt = conn.prepareStatement( sql );
+                pstmt.setString( 1, to.getSubject() );
+                pstmt.setString( 2, to.getMail() );
+                pstmt.setString( 3, to.getContent());
+                pstmt.setString( 4, newFileName );
+                pstmt.setString(5, to.getSeq());
+                pstmt.setString(6, to.getPassword());
+
+            } else {
+                String sql = "update album set subject=?, mail=?, content=? where seq=? and password=password( ? )";
+
+                pstmt = conn.prepareStatement( sql );
+                pstmt.setString( 1, to.getSubject() );
+                pstmt.setString( 2, to.getMail() );
+                pstmt.setString( 3, to.getContent() );
+                pstmt.setString(4, to.getSeq());
+                pstmt.setString( 5, to.getPassword() );
+            }
 
             int result = pstmt.executeUpdate();
-
             if( result == 0 ) {
                 flag = 1;
+
+                if( newFileName != null ) {
+                    File file = new File( uploadPath, newFileName );
+                    file.delete();
+                }
             } else if( result == 1 ) {
                 flag = 0;
+
+                if( newFileName != null && oldFileName != null ) {
+                    File file = new File( uploadPath, oldFileName );
+                    file.delete();
+                }
             }
+        } catch( NamingException e ) {
+            System.out.println( "[에러] " + e.getMessage() );
         } catch( SQLException e ) {
             System.out.println( "[에러] " + e.getMessage() );
         } finally {
-            if( pstmt != null ) try { pstmt.close(); } catch( SQLException e ) {}
-            if( conn != null ) try { conn.close(); } catch( SQLException e ) {}
+            if( pstmt != null ) {
+                try {pstmt.close();}
+                catch (SQLException e) {e.printStackTrace();}
+            }
+            if( conn != null ) {
+                try { conn.close();}
+                catch (SQLException e) {e.printStackTrace();}
+            }
         }
-
         return flag;
     }
 
