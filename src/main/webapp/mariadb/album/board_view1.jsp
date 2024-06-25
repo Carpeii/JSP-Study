@@ -1,5 +1,7 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+﻿<%@ page import="album.BoardDAO" %>
+<%@ page import="album.BoardTO" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+		 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,7 +11,35 @@
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="../../css/board_view.css">
 </head>
+<%
+	request.setCharacterEncoding( "utf-8" );
 
+	String cpage = request.getParameter( "cpage" );
+	String seq = request.getParameter( "seq" );
+
+	String subject = "";
+	String writer = "";
+	String mail = "";
+	String wip = "";
+	String wdate = "";
+	String hit = "";
+	String content = "";
+	String filename = "";
+	BoardDAO dao = new BoardDAO();
+	BoardTO to  = new BoardTO();
+
+	to.setSeq(seq);
+	to = dao.boardView(to);
+
+	subject = to.getSubject();
+	writer  = to.getWriter();
+	mail = to.getMail();
+	wip  = to.getWip();
+	wdate  = to.getWdate();
+	hit = to.getHit();
+	content = to.getContent();
+	filename = to.getFileName();
+%>
 <body>
 <!-- 상단 디자인 -->
 <div class="contents1"> 
@@ -25,24 +55,24 @@
 			<table>
 			<tr>
 				<th width="10%">제목</th>
-				<td width="60%">제주 올레길 좋아요(000.000.000.000)</td>
+				<td width="60%"><%=subject%>(<%=wip%>)</td>
 				<th width="10%">등록일</th>
-				<td width="20%">2016.03.02 21:11</td>
+				<td width="20%"><%=wdate%></td>
 			</tr>
 			<tr>
 				<th>글쓴이</th>
-				<td>여행자</td>
+				<td><%=writer%>></td>
 				<th>조회</th>
-				<td>345</td>
+				<td><%=hit%></td>
 			</tr>
 			<tr>
 				<td colspan="4" height="200" valign="top" style="padding:20px; line-height:160%">
 					<div id="bbs_file_wrap">
 						<div>
-							<img src="../../upload/607927_1.jpg" width="900" onerror="" /><br />
+							<img src="../../upload/<%=filename%>" width="900" onerror="" /><br />
 						</div>
 					</div>
-					시간이 되면 또 걷고 싶은 길이네요
+					<%=content%>
 				</td>
 			</tr>			
 			</table>

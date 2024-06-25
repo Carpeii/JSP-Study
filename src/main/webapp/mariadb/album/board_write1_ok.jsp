@@ -14,12 +14,17 @@
 <%@ page import="com.oreilly.servlet.MultipartRequest"%>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="java.io.File" %>
+<%@ page import="album.BoardDAO" %>
+<%@ page import="album.BoardTO" %>
 
 <%
+	request.setCharacterEncoding("utf-8");
 	String uploadPath = "/Users/kimjiwoong/javaprojects/myJSP/src/main/webapp/upload";
 	int maxFileSize = 2 * 1024 * 1024;
 	String encType = "utf-8";
-	
+	BoardTO to = new BoardTO();
+	BoardDAO dao = new BoardDAO();
+
 	MultipartRequest multi
 		= new MultipartRequest( request, uploadPath, maxFileSize, encType, new DefaultFileRenamePolicy() );
 	
@@ -41,40 +46,17 @@
 	if( multi.getFile( "upload" ) != null ) {
 		filesize = multi.getFile( "upload" ).length();
 	}
-	
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	
-	int flag = 1;
-	try {
-		Context initCtx = new InitialContext();
-		Context envCtx = (Context)initCtx.lookup( "java:comp/env" );
-		DataSource dataSource = (DataSource)envCtx.lookup( "jdbc/mariadb2" );
-	
-		conn = dataSource.getConnection();
-	
-		String sql = "insert into album values ( 0, ?, ?, ?, password( ? ), ?, ?, 0, ?, now() )";
-		pstmt = conn.prepareStatement( sql );
-		pstmt.setString( 1, subject );
-		pstmt.setString( 2, writer );
-		pstmt.setString( 3, mail );
-		pstmt.setString( 4, password );
-		pstmt.setString( 5, filename );
-		pstmt.setString( 6, content );
-		pstmt.setString( 7, wip );
-	
-		if( pstmt.executeUpdate() == 1 ) {
-			flag = 0;
-		}
-	} catch( NamingException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} catch( SQLException e ) {
-		System.out.println( "[에러] " + e.getMessage() );
-	} finally {
-		if( pstmt != null ) pstmt.close();
-		if( conn != null ) conn.close();
-	}
-	
+
+	to.setSubject(subject);
+	to.setWriter(writer);
+	to.setContent(content);
+	to.setWip(wip);
+	to.setPassword(password);
+	to.setFileName(filename);
+	to.setMail(mail);
+
+	int flag = dao.boardWriteOk(to);
+
 	out.println( "<script type='text/javascript'>" );
 	if( flag == 0 ) {
 		out.println( "alert('글쓰기에 성공');" );
