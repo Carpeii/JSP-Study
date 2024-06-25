@@ -42,7 +42,7 @@ public class BoardDAO {
             pstmt.setString( 1, to.getSubject() );
             pstmt.setString( 2, to.getWriter() );
             pstmt.setString( 3, to.getMail() );
-            pstmt.setString( 4, to.getFileName() );
+            pstmt.setString( 4, to.getPassword() );
             pstmt.setString( 5, to.getFileName() );
             pstmt.setString( 6, to.getContent() );
             pstmt.setString( 7, to.getWip() );
@@ -210,7 +210,7 @@ public class BoardDAO {
         try {
             conn = dataSource.getConnection();
 
-            String sql = "select subject, writer, mail from board1 where seq = ?";
+            String sql = "select subject, writer from album where seq = ?";
             pstmt = conn.prepareStatement( sql );
             pstmt.setString( 1, to.getSeq() );
 
@@ -238,7 +238,7 @@ public class BoardDAO {
         try {
             conn = this.dataSource.getConnection();
 
-            String sql = "delete from board1 where seq=? and password=password( ? )";
+            String sql = "delete from album where seq=? and password=password( ? )";
             pstmt = conn.prepareStatement( sql );
             pstmt.setString( 1, to.getSeq() );
             pstmt.setString( 2, to.getPassword() );
