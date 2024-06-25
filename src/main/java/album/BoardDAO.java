@@ -261,22 +261,23 @@ public class BoardDAO {
         return flag;
     }
     public BoardTO getPreviousPost(BoardTO to) {
-        BoardTO previousTo = null;
+        BoardTO previousTo = new BoardTO();
 
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        int flag = 2;
+
         try {
             conn = this.dataSource.getConnection();
 
-            String sql = "SELECT * FROM board1 WHERE seq < ? ORDER BY seq DESC LIMIT 1;";
+            String sql = "SELECT seq, subject FROM album WHERE seq < ? ORDER BY seq DESC LIMIT 1;";
             pstmt = conn.prepareStatement( sql );
             pstmt.setString( 1, to.getSeq() );
 
             rs = pstmt.executeQuery();
             if( rs.next() ) {
                 previousTo.setSeq( rs.getString( "seq" ) );
+                previousTo.setSubject( rs.getString( "subject" ) );
             }
         } catch( SQLException e ) {
             System.out.println( "[에러] : " + e.getMessage() );
@@ -285,11 +286,33 @@ public class BoardDAO {
             if( pstmt != null ) try { pstmt.close(); } catch( SQLException e ) {}
             if( conn != null ) try { conn.close(); } catch( SQLException e ) {}
         }
-
-        return to;
+        return previousTo;
     }
     public BoardTO getNextPost(BoardTO to){
-        BoardTO nextTo = null;
-        return null;
+        BoardTO nextTo = new BoardTO();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = this.dataSource.getConnection();
+
+            String sql = "SELECT seq, subject FROM album WHERE seq > ? ORDER BY seq ASC LIMIT 1;";
+            pstmt = conn.prepareStatement( sql );
+            pstmt.setString( 1, to.getSeq() );
+
+            rs = pstmt.executeQuery();
+            if( rs.next() ) {
+                nextTo.setSeq( rs.getString( "seq" ) );
+                nextTo.setSubject( rs.getString( "subject" ) );
+            }
+        } catch( SQLException e ) {
+            System.out.println( "[에러] : " + e.getMessage() );
+        } finally {
+            if( rs != null ) try { rs.close(); } catch( SQLException e ) {}
+            if( pstmt != null ) try { pstmt.close(); } catch( SQLException e ) {}
+            if( conn != null ) try { conn.close(); } catch( SQLException e ) {}
+        }
+        return nextTo;
     }
 }

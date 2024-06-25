@@ -39,6 +39,31 @@
 	hit = to.getHit();
 	content = to.getContent();
 	filename = to.getFileName();
+
+	StringBuilder sbHtml =new StringBuilder();
+
+	BoardTO nextTo = new BoardTO();
+	BoardTO previousTo = new BoardTO();
+
+//	nextTo.setSeq(dao.getNextPost(to).getSeq());
+//	previousTo.setSeq(dao.getPreviousPost(to).getSeq());
+	previousTo = dao.getPreviousPost(to);
+	nextTo = dao.getNextPost(to);
+
+	sbHtml.append("<div class=\"next_data_area\">");
+	if(nextTo.getSeq() == null || nextTo.getSeq().isEmpty()){
+		sbHtml.append("<span class=\"b\">다음글 | </span><a>다음글이 없습니다.</a>");
+	}else{
+		sbHtml.append("<span class=\"b\">다음글 | </span><a href=\"board_view1.jsp?seq="+ nextTo.getSeq()+"\">"+nextTo.getSubject()+"</a>");
+	}
+	sbHtml.append("</div>");
+	sbHtml.append("<div class=\"prev_data_area\">");
+	if(previousTo.getSeq() == null || previousTo.getSeq().isEmpty()){
+		sbHtml.append("<span class=\"b\">이전글 | </span><a>이전글이 없습니다.</a>");
+	}else{
+		sbHtml.append("<span class=\"b\">이전글 | </span><a href=\"board_view1.jsp?seq="+previousTo.getSeq()+"\">"+previousTo.getSubject()+"</a>");
+	}
+	sbHtml.append("</div>");
 %>
 <body>
 <!-- 상단 디자인 -->
@@ -61,7 +86,7 @@
 			</tr>
 			<tr>
 				<th>글쓴이</th>
-				<td><%=writer%>></td>
+				<td><%=writer%></td>
 				<th>조회</th>
 				<td><%=hit%></td>
 			</tr>
@@ -90,12 +115,13 @@
 		<!--//게시판-->
 		
 		<!-- 이전글 / 다음글 -->
-		<div class="next_data_area">
-			<span class="b">다음글 | </span><a href="board_view1.jsp">다음글이 없습니다.</a>
-		</div>
-		<div class="prev_data_area">
-			<span class="b">이전글 | </span><a href="board_view1.jsp">이전글이 없습니다.</a>
-		</div>
+		<%=sbHtml.toString()%>
+<%--		<div class="next_data_area">--%>
+<%--			<span class="b">다음글 | </span><a href="board_view1.jsp">다음글이 없습니다.</a>--%>
+<%--		</div>--%>
+<%--		<div class="prev_data_area">--%>
+<%--			<span class="b">이전글 | </span><a href="board_view1.jsp">이전글이 없습니다.</a>--%>
+<%--		</div>--%>
 		<!-- //이전글 / 다음글 -->
 	</div>
 <!-- 하단 디자인 -->
