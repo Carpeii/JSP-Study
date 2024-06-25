@@ -27,6 +27,20 @@
 					alert( '비밀번호를 입력하셔야 합니다.' );
 					return false;
 				}
+				// 업로드한 파일 필드
+				var uploadField = document.wfrm.upload;
+				// 업로드한 파일이 있다면
+				if(uploadField.value != "") {
+					// 허용할 파일 확장자들
+					var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+
+					// 업로드한 파일의 확장자를 소문자로 변환하고, 배열에서 찾아 인덱스를 반환
+					// 인덱스가 -1이라면 배열에 없는 확장자임
+					if (fileExtension.indexOf(uploadField.value.split('.').pop().toLowerCase()) == -1) {
+						alert('이미지 파일만 업로드 가능합니다 (확장자: jpeg, jpg, png, gif, bmp).');
+						return false;
+					}
+				}
 				document.wfrm.submit();
 			};
 		};
