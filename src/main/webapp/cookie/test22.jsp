@@ -13,6 +13,16 @@
     <title>Title</title>
 </head>
 <body>
-
+  <s:setDataSource var="ds"
+                   url="jdbc:mariadb://localhost/sample"
+                   driver="org.mariadb.jdbc.Driver"
+                   user="root"
+                   password="1234"/>
+출력 : ${ds}
+<s:update
+        var="result"
+        dataSource="${ds}"
+        sql = "INSERT INTO dept VALUES (60,'개발부', '서울');"
+        />
 </body>
 </html>
