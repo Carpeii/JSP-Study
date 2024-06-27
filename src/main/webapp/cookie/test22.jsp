@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: kimjiwoong
-  Date: 2024. 6. 27.
-  Time: 오후 12:16
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="s" uri="http://java.sun.com/jsp/jstl/sql" %>
@@ -13,16 +6,20 @@
     <title>Title</title>
 </head>
 <body>
-  <s:setDataSource var="ds"
-                   url="jdbc:mariadb://localhost/sample"
-                   driver="org.mariadb.jdbc.Driver"
-                   user="root"
-                   password="1234"/>
+<s:setDataSource var="ds"
+                 url="jdbc:mariadb://localhost/sample"
+                 driver="org.mariadb.jdbc.Driver"
+                 user="root"
+                 password="1234"/>
 출력 : ${ds}
-<s:update
+<s:query
         var="result"
         dataSource="${ds}"
-        sql = "INSERT INTO dept VALUES (60,'개발부', '서울');"
-        />
+        sql = "SELECT * FROM dept WHERE deptno = ?;">
+    <s:param value="${param.deptno}" />
+</s:query>
+<c:forEach var="row" items="${result.rows}">
+    번호: ${row.deptno}, 부서명: ${row.dname}, 위치: ${row.loc} <br/>
+</c:forEach>
 </body>
 </html>
