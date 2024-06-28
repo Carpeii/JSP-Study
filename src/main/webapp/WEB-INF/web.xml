@@ -16,10 +16,13 @@
 	<servlet>
 		<servlet-name>myServlet</servlet-name>
 		<servlet-class>servlet01.ServletEx01</servlet-class>
+		<init-param>
+			<param-name>exampleParam</param-name>
+			<param-value>exampleValue</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>myServlet</servlet-name>
 		<url-pattern>/Hello</url-pattern>
-
 	</servlet-mapping>
 </web-app>

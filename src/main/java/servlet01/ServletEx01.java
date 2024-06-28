@@ -2,16 +2,19 @@ package servlet01;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ServletEx01 extends HttpServlet {
-
+    private String exampleParam;
     @Override
-    public void init() throws ServletException {
-        System.out.println("init!!!");
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        exampleParam = config.getInitParameter("exampleParam");
+        System.out.println("init with parameter" + exampleParam);
     }
 
     @Override
@@ -46,6 +49,7 @@ public class ServletEx01 extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Received Text: " + inputText + "</h1>");
+        out.println("<h2>exampleParam Text: " +exampleParam + "</h2>");
         out.println("</body>");
         out.println("</html>");
         out.close();
